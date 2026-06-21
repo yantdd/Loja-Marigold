@@ -31,7 +31,7 @@ node index.js
 ## Guia de Testes
 Para validar todas as funcionalidades do sistema execute os seguintes passos:
 
-* Abra o navegador e acesse a rota local na porta 3000 para abrir a página index.html. Verifique a renderização dos cartões visuais das poções carregadas diretamente do banco de dados na tela.
-* Em outra aba do navegador acesse a rota local da página de administração abrindo o arquivo admin.html.
+* Abra o navegador e acesse a rota local na porta 3000 para abrir a página http://localhost:3000/index.html. Verifique a renderização dos cartões visuais das poções carregadas diretamente do banco de dados na tela.
+* Em outra aba do navegador acesse a rota local da página de administração abrindo http://localhost:3000/admin.html.
 * Na página de administração preencha o formulário para criar uma nova poção. Salve os dados e verifique imediatamente se o item recém criado apareceu na lista inferior.
 * Teste a exclusão de uma poção clicando no botão de remover ao lado de algum item da tabela. Confirme a decisão e verifique que o produto sumiu da lista com sucesso.
