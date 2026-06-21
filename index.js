@@ -34,7 +34,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-// funcao para inserir os dados iniciais exigidos pelo professor
+// funcao para inserir os dados iniciais
 async function popularBanco() {
   await sequelize.sync({ force: true });
 
