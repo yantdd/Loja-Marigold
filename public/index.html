@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Poções e Soluções</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+    <nav class="navegacao">
+        Poções e Soluções
+    </nav>
+
+    <div class="conteinerPrincipal">
+        <section class="secaoSecundaria">
+            <h2 class="tituloSecao">Sobre a Loja</h2>
+            <p class="paragrafoPadrao">Bem vindo a Poções e Soluções. Somos a principal fornecedora de elixires mágicos
+                e misturas raras para todas as suas necessidades. Nossa missão é oferecer produtos da mais alta
+                qualidade para garantir a satisfação dos nossos clientes mais exigentes.</p>
+        </section>
+
+        <section class="secaoSecundaria">
+            <h2 class="tituloSecao">Nosso Histórico</h2>
+            <div class="gridHistorico">
+                <div class="textoHistorico">
+                    <p class="paragrafoPadrao">Fundada no ano de 1867, a loja Poções e Soluções carrega séculos de
+                        tradição no preparo de fórmulas secretas. Começamos como um pequeno caldeirão familiar e hoje
+                        somos referência absoluta no mercado arcano. Cada frasco contém ingredientes selecionados e
+                        muita dedicação da nossa família Merigold.</p>
+                    <br>
+                    <p class="paragrafoPadrao">Ao longo das décadas nós refinamos técnicas antigas de alquimia que foram passadas de geração em geração. Nossa busca incansável pela perfeição atrai viajantes magos e guerreiros de todos os cantos do continente. Aqui você não encontra apenas mercadorias mas sim o resultado de incontáveis noites de estudos mágicos debruçados sobre livros antigos sob a luz das estrelas.</p>
+                </div>
+                <div class="imagemHistorico">
+                    <img src="imagens/entrada.png" alt="Foto Historica">
+                </div>
+            </div>
+        </section>
+
+        <section class="secaoSecundaria">
+            <h2 class="tituloSecao">Nossas Poções</h2>
+            <div class="gridProdutos" id="listaProdutos">
+            </div>
+        </section>
+    </div>
+
+    <footer class="rodape">
+        <p>Contato: contato@pocoesesolucoes.com.br</p>
+        <p>Endereço: Beco Escuro, Número 42</p>
+    </footer>
+
+    <script>
+        const listaProdutos = document.getElementById("listaProdutos");
+
+        async function carregarProdutos() {
+            try {
+                const resposta = await fetch("/pocoes");
+                const pocoes = await resposta.json();
+
+                listaProdutos.innerHTML = "";
+
+                for (let pocao of pocoes) {
+                    const col = document.createElement("div");
+
+                    const conteudoImagem = pocao.imagem ?
+                        `<img src="${pocao.imagem}" class="imagemPocao" alt="Imagem da pocao">` :
+                        `<div class="imagemHistorico imagemPocao"><span>Sem Imagem</span></div>`;
+
+                    col.innerHTML = `
+                        <div class="cartaoProduto">
+                            ${conteudoImagem}
+                            <div class="corpoCartao">
+                                <h5 class="tituloPocao">${pocao.nome}</h5>
+                                <p class="descricaoPocao">${pocao.descricao}</p>
+                                <h6 class="precoPocao">Preço: ${pocao.preco} moedas</h6>
+                                <button class="botaoComprar">Comprar</button>
+                            </div>
+                        </div>
+                    `;
+
+                    listaProdutos.appendChild(col);
+                }
+            } catch (erro) {
+                console.error("Erro ao carregar os produtos", erro);
+                listaProdutos.innerHTML = "<p class='mensagemErro'>Falha ao carregar o catálogo de poções.</p>";
+            }
+        }
+
+        carregarProdutos();
+    </script>
+</body>
+
+</html>

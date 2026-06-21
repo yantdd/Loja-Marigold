@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Administração Merigold</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <h1 class="tituloPagina">Administração de Poções Merigold</h1>
+    
+    <div class="cartaoAdmin">
+        <h5 class="tituloCartao">Cadastrar Nova Poção</h5>
+        <form id="formularioPocao">
+            <div class="grupoFormulario">
+                <label for="nomePocao" class="rotuloFormulario">Nome</label>
+                <input type="text" class="controleFormulario" id="nomePocao" required>
+            </div>
+            <div class="grupoFormulario">
+                <label for="descricaoPocao" class="rotuloFormulario">Descrição</label>
+                <textarea class="controleFormulario" id="descricaoPocao" rows="3" required></textarea>
+            </div>
+            <div class="grupoFormulario">
+                <label for="imagemPocao" class="rotuloFormulario">URL da Imagem</label>
+                <input type="url" class="controleFormulario" id="imagemPocao">
+            </div>
+            <div class="grupoFormulario">
+                <label for="precoPocao" class="rotuloFormulario">Preço</label>
+                <input type="number" class="controleFormulario" id="precoPocao" required>
+            </div>
+            <button type="submit" class="botaoPrimario">Cadastrar</button>
+        </form>
+    </div>
+
+    <div class="cartaoAdmin">
+        <h5 class="tituloCartao">Poções Cadastradas</h5>
+        <table class="tabelaPocoes">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Preço</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaPocoesCorpo">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="modalConfirmacao" class="modalFundo" style="display: none;">
+        <div class="modalConteudo">
+            <h5 class="tituloCartao">Confirmar Remoção</h5>
+            <p>Você tem certeza que deseja remover esta poção do catálogo?</p>
+            <div class="modalBotoes">
+                <button class="botaoPrimario" onclick="cancelarRemocao()">Cancelar</button>
+                <button class="botaoPerigo" onclick="confirmarRemocao()">Remover</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const formularioPocao = document.getElementById("formularioPocao");
+        const tabelaPocoesCorpo = document.getElementById("tabelaPocoesCorpo");
+
+        async function carregarPocoes() {
+            try {
+                const resposta = await fetch("/pocoes");
+                const pocoes = await resposta.json();
+                
+                tabelaPocoesCorpo.innerHTML = "";
+                
+                for (let pocao of pocoes) {
+                    const linha = document.createElement("tr");
+                    
+                    linha.innerHTML = `
+                        <td>${pocao.id}</td>
+                        <td>${pocao.nome}</td>
+                        <td>${pocao.descricao}</td>
+                        <td>${pocao.preco}</td>
+                        <td>
+                            <button class="botaoPerigo" onclick="removerPocao(${pocao.id})">Remover</button>
+                        </td>
+                    `;
+                    
+                    tabelaPocoesCorpo.appendChild(linha);
+                }
+            } catch (erro) {
+                console.error("Erro ao carregar as pocoes", erro);
+                alert("Falha ao carregar as pocoes cadastradas");
+            }
+        }
+
+        formularioPocao.addEventListener("submit", async (evento) => {
+            evento.preventDefault();
+            
+            const novaPocao = {
+                nome: document.getElementById("nomePocao").value,
+                descricao: document.getElementById("descricaoPocao").value,
+                imagem: document.getElementById("imagemPocao").value,
+                preco: parseFloat(document.getElementById("precoPocao").value)
+            };
+
+            try {
+                const resposta = await fetch("/pocoes", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(novaPocao)
+                });
+
+                if (resposta.ok) {
+                    formularioPocao.reset();
+                    carregarPocoes();
+                } else {
+                    alert("Falha ao cadastrar a pocao");
+                }
+            } catch (erro) {
+                console.error("Erro ao cadastrar a pocao", erro);
+                alert("Falha ao cadastrar a pocao");
+            }
+        });
+
+        let pocaoIdParaRemover = null;
+
+        function removerPocao(id) {
+            pocaoIdParaRemover = id;
+            document.getElementById("modalConfirmacao").style.display = "flex";
+        }
+
+        function cancelarRemocao() {
+            pocaoIdParaRemover = null;
+            document.getElementById("modalConfirmacao").style.display = "none";
+        }
+
+        async function confirmarRemocao() {
+            if (!pocaoIdParaRemover) return;
+
+            try {
+                const resposta = await fetch("/pocoes/" + pocaoIdParaRemover, {
+                    method: "DELETE"
+                });
+
+                if (resposta.ok) {
+                    carregarPocoes();
+                } else {
+                    alert("Falha ao remover a pocao");
+                }
+            } catch (erro) {
+                console.error("Erro ao remover a pocao", erro);
+                alert("Falha ao remover a pocao");
+            } finally {
+                cancelarRemocao();
+            }
+        }
+
+        carregarPocoes();
+    </script>
+</body>
+</html>
